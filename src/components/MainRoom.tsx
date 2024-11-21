@@ -1,13 +1,16 @@
 import React, {useState} from 'react';
 import { useDrop } from 'react-dnd';
-import { Paper, IconButton } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete'
+import { Paper, ButtonGroup, Button } from '@material-ui/core';
+import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
+import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
+import PanToolOutlinedIcon from '@material-ui/icons/PanToolOutlined';
 
 const ItemType = {
   IMAGE: 'image',
 };
 
 interface DroppedImage {
+  id: number;
   src: string;
   alt: string;
   x: number;
@@ -36,12 +39,16 @@ const MainRoom = () => {
 
           setDroppedImages((prev) => [
             ...prev,
-            { src: item.src, alt: item.alt, x: adjustedX, y: adjustedY },
+            { id: Date.now(), src: item.src, alt: item.alt, x: adjustedX, y: adjustedY },
           ]);
         }
       }
     },
   }));
+
+  const handleDelete = (id: number) => { 
+    setDroppedImages((prev) => prev.filter((image) => image.id !== id)); 
+  };
 
   return (
     <Paper
@@ -54,11 +61,9 @@ const MainRoom = () => {
         backgroundImage: 'radial-gradient(circle, #e3e2e2 1px, transparent 1px)',
         backgroundSize: '15px 15px',
     }}>
-      {droppedImages.map((image, index) => (
-        <img
-          key={index}
-          src={image.src}
-          alt={image.alt}
+      {droppedImages.map((image) => (
+        <div
+          key={image.id}
           style={{
             width: '100px',
             height: '100px',
@@ -66,7 +71,21 @@ const MainRoom = () => {
             left: `${image.x}px`,
             top: `${image.y}px`,
           }}
-        />
+        >
+          <img 
+            src={image.src} 
+            alt={image.alt} 
+            style={{ 
+              width: '100%', 
+              height: '100%'
+            }} 
+          />
+          <ButtonGroup variant="contained" size="small" aria-label="small outlined button group">
+            <Button title='move'><PanToolOutlinedIcon fontSize='small'/></Button>
+            <Button title='copy'><FileCopyOutlinedIcon fontSize='small'/></Button>
+            <Button title='delete' onClick={() => handleDelete(image.id)}><DeleteOutlinedIcon fontSize='small'/></Button>
+          </ButtonGroup>
+        </div>
       ))}
     </Paper>
   );
